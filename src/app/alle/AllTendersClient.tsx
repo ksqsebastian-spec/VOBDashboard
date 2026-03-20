@@ -6,15 +6,16 @@ import { TenderTable } from '@/components/tenders/TenderTable'
 import { TenderDrawer } from '@/components/tenders/TenderDrawer'
 import { SearchBar } from '@/components/filters/SearchBar'
 import { Button } from '@/components/ui/button'
-import type { DashboardRow } from '@/lib/types'
+import type { Company, DashboardRow } from '@/lib/types'
 
 interface AllTendersClientProps {
   tenders: DashboardRow[]
   total: number
   page: number
+  companies: Company[]
 }
 
-export function AllTendersClient({ tenders, total, page }: AllTendersClientProps) {
+export function AllTendersClient({ tenders, total, page, companies }: AllTendersClientProps) {
   const [search, setSearch] = useState('')
   const [selectedTender, setSelectedTender] = useState<DashboardRow | null>(null)
 
@@ -46,6 +47,7 @@ export function AllTendersClient({ tenders, total, page }: AllTendersClientProps
 
       <TenderTable
         tenders={filtered}
+        companies={companies}
         onRowClick={tender => setSelectedTender(tender)}
       />
 
@@ -70,6 +72,7 @@ export function AllTendersClient({ tenders, total, page }: AllTendersClientProps
       <TenderDrawer
         tender={selectedTender}
         allMatches={allMatches}
+        companies={companies}
         open={!!selectedTender}
         onOpenChange={open => { if (!open) setSelectedTender(null) }}
       />

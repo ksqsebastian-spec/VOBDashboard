@@ -6,16 +6,18 @@ import { Button } from '@/components/ui/button'
 import { UrgencyBadge } from './UrgencyBadge'
 import { formatDeadline, daysUntilDeadline, getRelevanceBgClass, computeUrgency } from '@/lib/utils'
 import { ExternalLink, Download } from 'lucide-react'
-import type { DashboardRow } from '@/lib/types'
+import { suggestCompany } from '@/lib/match-suggest'
+import type { Company, DashboardRow } from '@/lib/types'
 
 interface TenderDrawerProps {
   tender: DashboardRow | null
   allMatches?: DashboardRow[]
+  companies?: Company[]
   open: boolean
   onOpenChange: (open: boolean) => void
 }
 
-export function TenderDrawer({ tender, allMatches = [], open, onOpenChange }: TenderDrawerProps) {
+export function TenderDrawer({ tender, allMatches = [], companies = [], open, onOpenChange }: TenderDrawerProps) {
   if (!tender) return null
 
   const urgency = tender.urgency || computeUrgency(tender.deadline_date)
@@ -75,18 +77,18 @@ export function TenderDrawer({ tender, allMatches = [], open, onOpenChange }: Te
               <div className="space-y-2">
                 {allMatches.map((match, i) => (
                   match.company_name && (
-                    <div key={i} className="p-3 rounded-lg bg-neutral-50 border border-neutral-100">
+                    <div key={i} className="p-3 rounded-lg bg-neutral-50 border border-neutral-100 border-l-[3px]" style={{ borderLeftColor: match.company_color ?? '#a3a3a3' }}>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: match.company_color ?? '#a3a3a3' }} />
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: match.company_color ?? '#a3a3a3' }} />
                         <span className="text-[12px] font-medium text-neutral-700">{match.company_name}</span>
                         {match.relevance && (
-                          <Badge variant="outline" className={`text-[10px] ${getRelevanceBgClass(match.relevance)}`}>
+                          <Badge variant="outline" className={`ml-auto shrink-0 text-[10px] ${getRelevanceBgClass(match.relevance)}`}>
                             {match.relevance}
                           </Badge>
                         )}
                       </div>
                       {match.reason && (
-                        <p className="text-[11px] text-neutral-400 pl-4">{match.reason}</p>
+                        <p className="text-[11px] text-neutral-500 pl-[18px] line-clamp-2">{match.reason}</p>
                       )}
                     </div>
                   )
@@ -94,6 +96,25 @@ export function TenderDrawer({ tender, allMatches = [], open, onOpenChange }: Te
               </div>
             </div>
           )}
+
+          {allMatches.filter(m => m.company_name).length === 0 && companies.length > 0 && (() => {
+            const suggestion = suggestCompany(tender.category, tender.title, companies)
+            return suggestion ? (
+              <div>
+                <p className="text-[10px] text-neutral-400 mb-2">Vorgeschlagene Zuordnung</p>
+                <div className="p-3 rounded-lg bg-amber-50/50 border border-amber-200/60 border-l-[3px]" style={{ borderLeftColor: suggestion.company.color }}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: suggestion.company.color }} />
+                    <span className="text-[12px] font-medium text-neutral-700">{suggestion.company.name}</span>
+                    <Badge variant="outline" className="ml-auto shrink-0 text-[10px] bg-amber-50 text-amber-600 border-amber-200">Vorschlag</Badge>
+                  </div>
+                  <p className="text-[11px] text-neutral-500 pl-[18px]">
+                    Basierend auf Gewerk-Übereinstimmung mit {suggestion.company.trades.slice(0, 3).join(', ')}
+                  </p>
+                </div>
+              </div>
+            ) : null
+          })()}
 
           {tender.reason && allMatches.length === 0 && (
             <div>
