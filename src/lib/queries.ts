@@ -11,7 +11,7 @@ export async function getDashboardData() {
     supabase.from('companies').select('*').eq('active', true).order('name'),
     supabase.from('vob_scans').select('*').order('scan_date', { ascending: false }).limit(1).single(),
     supabase.from('vob_dashboard').select('*').not('company_slug', 'is', null).order('created_at', { ascending: false }).limit(20),
-    supabase.from('company_trends').select('*').order('year', { ascending: false }).order('calendar_week', { ascending: false }).limit(80)
+    supabase.from('company_trends').select('*').order('year', { ascending: false }).order('calendar_week', { ascending: false }).limit(300)
   ])
   return {
     companies: (companies ?? []) as Company[],

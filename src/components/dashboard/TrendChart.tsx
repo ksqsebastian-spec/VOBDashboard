@@ -16,7 +16,7 @@ interface TrendChartProps {
   trends: CompanyTrend[]
 }
 
-type TimeFrame = 'week' | 'month' | '4weeks'
+type TimeFrame = 'week' | 'month' | '6months'
 
 export function TrendChart({ trends }: TrendChartProps) {
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('week')
@@ -35,9 +35,16 @@ export function TrendChart({ trends }: TrendChartProps) {
     weekMap.get(key)![t.company_slug] = t.tender_count
   }
 
-  const chartData = Array.from(weekMap.entries())
+  const allChartData = Array.from(weekMap.entries())
     .map(([week, data]) => ({ week, ...data }))
     .reverse()
+
+  const weekLimits: Record<TimeFrame, number> = {
+    week: 1,
+    month: 4,
+    '6months': 26,
+  }
+  const chartData = allChartData.slice(-weekLimits[timeFrame])
 
   const companies = Array.from(companyMap.entries())
 
@@ -58,7 +65,7 @@ export function TrendChart({ trends }: TrendChartProps) {
           {([
             ['week', 'Woche'],
             ['month', 'Monat'],
-            ['4weeks', '4 Wochen'],
+            ['6months', '6 Monate'],
           ] as [TimeFrame, string][]).map(([key, label]) => (
             <button
               key={key}
