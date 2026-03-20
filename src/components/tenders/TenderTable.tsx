@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import {
   Table,
   TableBody,
@@ -8,18 +9,32 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { UrgencyBadge } from './UrgencyBadge'
 import { NewBadge } from './NewBadge'
 import { formatDeadline, computeUrgency } from '@/lib/utils'
-import type { DashboardRow } from '@/lib/types'
+import { suggestCompany } from '@/lib/match-suggest'
+import type { Company, DashboardRow } from '@/lib/types'
 
 interface TenderTableProps {
   tenders: DashboardRow[]
   latestScanDate?: string | null
+  companies?: Company[]
   onRowClick?: (tender: DashboardRow) => void
 }
 
-export function TenderTable({ tenders, latestScanDate, onRowClick }: TenderTableProps) {
+export function TenderTable({ tenders, latestScanDate, companies = [], onRowClick }: TenderTableProps) {
+  const suggestions = useMemo(() => {
+    if (companies.length === 0) return new Map<string, ReturnType<typeof suggestCompany>>()
+    const map = new Map<string, ReturnType<typeof suggestCompany>>()
+    for (const t of tenders) {
+      if (!t.company_name) {
+        map.set(t.tender_id, suggestCompany(t.category, t.title, companies))
+      }
+    }
+    return map
+  }, [tenders, companies])
+
   return (
     <div className="bg-white border border-neutral-200/60 rounded-xl overflow-hidden">
       <Table>
@@ -66,7 +81,16 @@ export function TenderTable({ tenders, latestScanDate, onRowClick }: TenderTable
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: tender.company_color ?? '#a3a3a3' }} />
                       {tender.company_name}
                     </span>
-                  ) : '—'}
+                  ) : (() => {
+                    const suggestion = suggestions.get(tender.tender_id)
+                    return suggestion ? (
+                      <span className="flex items-center gap-1.5 text-neutral-400 italic">
+                        <span className="w-1.5 h-1.5 rounded-full border border-current shrink-0" style={{ borderColor: suggestion.company.color }} />
+                        <span className="truncate">{suggestion.company.name}</span>
+                        <Badge variant="outline" className="shrink-0 text-[9px] bg-amber-50 text-amber-600 border-amber-200">Vorschlag</Badge>
+                      </span>
+                    ) : '—'
+                  })()}
                 </TableCell>
                 <TableCell>
                   <UrgencyBadge urgency={urgency} />
