@@ -7,7 +7,6 @@ import {
   LayoutDashboard,
   FileText,
   Clock,
-  Building2,
 } from 'lucide-react'
 import type { Company } from '@/lib/types'
 
@@ -32,7 +31,7 @@ function CompanyIcon({ name, color }: { name: string; color: string }) {
 
   return (
     <span
-      className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+      className="w-7 h-7 rounded-[8px] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0 transition-transform duration-150 group-hover:scale-105"
       style={{ backgroundColor: color }}
     >
       {initials}
@@ -44,22 +43,20 @@ export function Sidebar({ companies, matchCounts = {} }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-[#0B1929] text-white z-40">
+    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-gradient-to-b from-[#0B1929] to-[#0D1F33] text-white z-40">
       {/* Brand */}
-      <div className="flex items-center h-16 px-5 border-b border-white/10">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+      <div className="flex items-center h-16 px-5 border-b border-white/[0.06]">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25 transition-shadow group-hover:shadow-blue-500/40">
             <span className="text-white font-black text-sm">GW</span>
           </div>
-          <div>
-            <span className="font-bold text-white text-[15px] tracking-tight">VOB Monitor</span>
-          </div>
+          <span className="font-bold text-white text-[15px] tracking-[-0.01em]">VOB Monitor</span>
         </Link>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-5 px-3">
         {/* Main nav */}
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {navItems.map(item => {
             const Icon = item.icon
             const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
@@ -68,13 +65,16 @@ export function Sidebar({ companies, matchCounts = {} }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all duration-150',
+                  'flex items-center gap-3 px-3 py-2.5 text-[13px] rounded-lg transition-all duration-200 relative',
                   isActive
-                    ? 'bg-white/15 text-white font-medium shadow-sm'
-                    : 'text-white/60 hover:bg-white/8 hover:text-white/90'
+                    ? 'bg-white/[0.12] text-white font-medium'
+                    : 'text-white/50 hover:bg-white/[0.06] hover:text-white/80'
                 )}
               >
-                <Icon size={18} className={isActive ? 'text-blue-400' : ''} />
+                {isActive && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-blue-400 rounded-r-full" />
+                )}
+                <Icon size={17} strokeWidth={isActive ? 2 : 1.5} className={cn('transition-colors', isActive ? 'text-blue-400' : '')} />
                 {item.label}
               </Link>
             )
@@ -83,7 +83,7 @@ export function Sidebar({ companies, matchCounts = {} }: SidebarProps) {
 
         {/* Companies section */}
         <div className="mt-7">
-          <p className="px-3 text-[10px] font-semibold text-white/40 uppercase tracking-[0.15em] mb-3">
+          <p className="px-3 text-[10px] font-semibold text-white/30 uppercase tracking-[0.15em] mb-3">
             Unternehmen
           </p>
           <div className="space-y-0.5">
@@ -96,18 +96,21 @@ export function Sidebar({ companies, matchCounts = {} }: SidebarProps) {
                   key={company.slug}
                   href={href}
                   className={cn(
-                    'flex items-center justify-between px-2 py-2 text-sm rounded-lg transition-all duration-150 group',
+                    'flex items-center justify-between px-2 py-1.5 text-[13px] rounded-lg transition-all duration-200 group relative',
                     isActive
-                      ? 'bg-white/15 text-white font-medium'
-                      : 'text-white/60 hover:bg-white/8 hover:text-white/90'
+                      ? 'bg-white/[0.12] text-white font-medium'
+                      : 'text-white/50 hover:bg-white/[0.06] hover:text-white/80'
                   )}
                 >
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full" style={{ backgroundColor: company.color }} />
+                  )}
                   <span className="flex items-center gap-2.5 truncate">
                     <CompanyIcon name={company.name} color={company.color} />
-                    <span className="truncate text-[13px]">{company.name}</span>
+                    <span className="truncate">{company.name}</span>
                   </span>
                   {count > 0 && (
-                    <span className="ml-2 text-[10px] font-semibold bg-white/15 text-white/80 px-2 py-0.5 rounded-full">
+                    <span className="ml-2 text-[10px] font-semibold bg-white/10 text-white/70 px-2 py-0.5 rounded-full tabular-nums">
                       {count}
                     </span>
                   )}
@@ -118,21 +121,27 @@ export function Sidebar({ companies, matchCounts = {} }: SidebarProps) {
         </div>
 
         {/* History */}
-        <div className="mt-6 pt-5 border-t border-white/10">
+        <div className="mt-6 pt-5 border-t border-white/[0.06]">
           <Link
             href="/verlauf"
             className={cn(
-              'flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all duration-150',
+              'flex items-center gap-3 px-3 py-2.5 text-[13px] rounded-lg transition-all duration-200 relative',
               pathname === '/verlauf'
-                ? 'bg-white/15 text-white font-medium shadow-sm'
-                : 'text-white/60 hover:bg-white/8 hover:text-white/90'
+                ? 'bg-white/[0.12] text-white font-medium'
+                : 'text-white/50 hover:bg-white/[0.06] hover:text-white/80'
             )}
           >
-            <Clock size={18} className={pathname === '/verlauf' ? 'text-blue-400' : ''} />
+            {pathname === '/verlauf' && (
+              <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-blue-400 rounded-r-full" />
+            )}
+            <Clock size={17} strokeWidth={pathname === '/verlauf' ? 2 : 1.5} className={pathname === '/verlauf' ? 'text-blue-400' : ''} />
             Verlauf
           </Link>
         </div>
       </nav>
+
+      {/* Bottom subtle gradient fade */}
+      <div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
     </aside>
   )
 }
