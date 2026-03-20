@@ -22,22 +22,22 @@ interface TenderTableProps {
 
 export function TenderTable({ tenders, latestScanDate, onRowClick }: TenderTableProps) {
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-white">
       <Table>
         <TableHeader>
-          <TableRow className="bg-[#F8FAFC]">
-            <TableHead className="text-xs">Titel</TableHead>
-            <TableHead className="text-xs">Auftraggeber</TableHead>
-            <TableHead className="text-xs">Frist</TableHead>
-            <TableHead className="text-xs">Gewerk</TableHead>
-            <TableHead className="text-xs">Unternehmen</TableHead>
-            <TableHead className="text-xs">Status</TableHead>
+          <TableRow className="bg-slate-50/80 border-b border-slate-200/80">
+            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Titel</TableHead>
+            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Auftraggeber</TableHead>
+            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Frist</TableHead>
+            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Gewerk</TableHead>
+            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Unternehmen</TableHead>
+            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tenders.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-sm text-[#94A3B8] py-8">
+              <TableCell colSpan={6} className="text-center text-sm text-slate-400 py-12">
                 Keine Ausschreibungen gefunden.
               </TableCell>
             </TableRow>
@@ -50,24 +50,24 @@ export function TenderTable({ tenders, latestScanDate, onRowClick }: TenderTable
             return (
               <TableRow
                 key={`${tender.tender_id}-${i}`}
-                className={`cursor-pointer hover:bg-[#F8FAFC] ${!hasMatch ? 'opacity-60' : ''}`}
+                className={`cursor-pointer hover:bg-slate-50/80 transition-colors ${!hasMatch ? 'opacity-50' : ''}`}
                 onClick={() => onRowClick?.(tender)}
               >
                 <TableCell className="text-sm max-w-xs">
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2">
                     {hasMatch && tender.company_color && (
-                      <span className="w-1 h-6 rounded-full flex-shrink-0" style={{ backgroundColor: tender.company_color }} />
+                      <span className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: tender.company_color }} />
                     )}
-                    <span className="line-clamp-1">{tender.title}</span>
+                    <span className="line-clamp-1 font-medium text-slate-800">{tender.title}</span>
                     {isNew && <NewBadge />}
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-[#64748B]">{tender.authority ?? '—'}</TableCell>
-                <TableCell className="text-xs">{formatDeadline(tender.deadline_date)}</TableCell>
-                <TableCell className="text-xs">{tender.category ?? '—'}</TableCell>
+                <TableCell className="text-xs text-slate-500">{tender.authority ?? '—'}</TableCell>
+                <TableCell className="text-xs text-slate-600">{formatDeadline(tender.deadline_date)}</TableCell>
+                <TableCell className="text-xs text-slate-500">{tender.category ?? '—'}</TableCell>
                 <TableCell className="text-xs">
                   {tender.company_name ? (
-                    <Badge variant="outline" className="text-[10px]" style={{ borderColor: tender.company_color ?? undefined }}>
+                    <Badge variant="outline" className="text-[10px] border-slate-200" style={{ borderColor: tender.company_color ?? undefined }}>
                       {tender.company_name}
                     </Badge>
                   ) : '—'}

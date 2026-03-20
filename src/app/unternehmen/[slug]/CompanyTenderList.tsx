@@ -6,6 +6,7 @@ import { TenderTable } from '@/components/tenders/TenderTable'
 import { TenderDrawer } from '@/components/tenders/TenderDrawer'
 import { SearchBar } from '@/components/filters/SearchBar'
 import { StatusFilter } from '@/components/filters/StatusFilter'
+import { LayoutGrid, List, FileSearch } from 'lucide-react'
 import type { DashboardRow } from '@/lib/types'
 
 interface CompanyTenderListProps {
@@ -45,29 +46,32 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
           <StatusFilter value={status} onChange={setStatus} />
           <SearchBar value={search} onChange={setSearch} placeholder="Ausschreibungen suchen..." />
         </div>
-        <div className="flex gap-1 bg-[#F1F5F9] rounded-lg p-0.5">
+        <div className="flex gap-0.5 bg-slate-100 rounded-xl p-0.5">
           <button
             onClick={() => setView('cards')}
-            className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-              view === 'cards' ? 'bg-white text-[#1E293B] shadow-sm font-medium' : 'text-[#64748B]'
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg transition-all duration-150 ${
+              view === 'cards' ? 'bg-white text-slate-800 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
+            <LayoutGrid size={13} />
             Karten
           </button>
           <button
             onClick={() => setView('table')}
-            className={`px-3 py-1.5 text-xs rounded-md transition-colors ${
-              view === 'table' ? 'bg-white text-[#1E293B] shadow-sm font-medium' : 'text-[#64748B]'
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg transition-all duration-150 ${
+              view === 'table' ? 'bg-white text-slate-800 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
+            <List size={13} />
             Tabelle
           </button>
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="py-12 text-center">
-          <p className="text-[#94A3B8]">Aktuell keine passenden Ausschreibungen.</p>
+        <div className="py-16 text-center">
+          <FileSearch size={40} className="text-slate-200 mx-auto mb-3" />
+          <p className="text-slate-400 text-sm">Aktuell keine passenden Ausschreibungen.</p>
         </div>
       ) : view === 'cards' ? (
         <div className="space-y-3">
