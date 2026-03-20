@@ -13,15 +13,15 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
   ]
 
   return (
-    <div className="flex gap-0.5 bg-slate-100 rounded-xl p-0.5">
+    <div className="flex gap-px bg-neutral-100 rounded-lg p-px">
       {options.map(opt => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
-          className={`px-3.5 py-1.5 text-xs rounded-lg transition-all duration-150 ${
+          className={`px-2.5 py-1 text-[11px] rounded-md transition-colors ${
             value === opt.value
-              ? 'bg-white text-slate-800 shadow-sm font-semibold'
-              : 'text-slate-500 hover:text-slate-700'
+              ? 'bg-white text-neutral-900 shadow-sm font-medium'
+              : 'text-neutral-400 hover:text-neutral-600'
           }`}
         >
           {opt.label}

@@ -6,7 +6,6 @@ import { TenderTable } from '@/components/tenders/TenderTable'
 import { TenderDrawer } from '@/components/tenders/TenderDrawer'
 import { SearchBar } from '@/components/filters/SearchBar'
 import { StatusFilter } from '@/components/filters/StatusFilter'
-import { LayoutGrid, List, FileSearch } from 'lucide-react'
 import type { DashboardRow } from '@/lib/types'
 
 interface CompanyTenderListProps {
@@ -41,40 +40,37 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-4">
         <div className="flex gap-3 items-center flex-wrap">
           <StatusFilter value={status} onChange={setStatus} />
-          <SearchBar value={search} onChange={setSearch} placeholder="Ausschreibungen suchen..." />
+          <SearchBar value={search} onChange={setSearch} placeholder="Suchen..." />
         </div>
-        <div className="flex gap-0.5 bg-slate-100 rounded-xl p-0.5">
+        <div className="flex gap-px bg-neutral-100 rounded-lg p-px">
           <button
             onClick={() => setView('cards')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg transition-all duration-150 ${
-              view === 'cards' ? 'bg-white text-slate-800 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-700'
+            className={`px-2.5 py-1 text-[11px] rounded-md transition-colors ${
+              view === 'cards' ? 'bg-white text-neutral-900 shadow-sm font-medium' : 'text-neutral-400'
             }`}
           >
-            <LayoutGrid size={13} />
             Karten
           </button>
           <button
             onClick={() => setView('table')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg transition-all duration-150 ${
-              view === 'table' ? 'bg-white text-slate-800 shadow-sm font-semibold' : 'text-slate-500 hover:text-slate-700'
+            className={`px-2.5 py-1 text-[11px] rounded-md transition-colors ${
+              view === 'table' ? 'bg-white text-neutral-900 shadow-sm font-medium' : 'text-neutral-400'
             }`}
           >
-            <List size={13} />
             Tabelle
           </button>
         </div>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="py-16 text-center">
-          <FileSearch size={40} className="text-slate-200 mx-auto mb-3" />
-          <p className="text-slate-400 text-sm">Aktuell keine passenden Ausschreibungen.</p>
-        </div>
+        <p className="text-[12px] text-neutral-400 py-12 text-center">
+          Keine passenden Ausschreibungen.
+        </p>
       ) : view === 'cards' ? (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filtered.map((tender, i) => (
             <TenderCard
               key={`${tender.tender_id}-${i}`}

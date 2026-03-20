@@ -39,9 +39,9 @@ export function AllTendersClient({ tenders, total, page }: AllTendersClientProps
 
   return (
     <>
-      <div className="flex items-center justify-between gap-4">
-        <SearchBar value={search} onChange={setSearch} placeholder="Ausschreibungen suchen..." />
-        <p className="text-sm text-[#64748B] whitespace-nowrap">{total} Ergebnisse</p>
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <SearchBar value={search} onChange={setSearch} placeholder="Suchen..." />
+        <p className="text-[11px] text-neutral-400 whitespace-nowrap tabular-nums">{total} Ergebnisse</p>
       </div>
 
       <TenderTable
@@ -50,18 +50,18 @@ export function AllTendersClient({ tenders, total, page }: AllTendersClientProps
       />
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-4">
+        <div className="flex items-center justify-center gap-2 pt-6">
           {page > 1 && (
             <Link href={`/alle?page=${page - 1}`}>
-              <Button variant="outline" size="sm">Zurück</Button>
+              <Button variant="outline" size="sm" className="text-[11px] text-neutral-500 border-neutral-200">Zurück</Button>
             </Link>
           )}
-          <span className="text-sm text-[#64748B]">
-            Seite {page} von {totalPages}
+          <span className="text-[11px] text-neutral-400 tabular-nums">
+            {page} / {totalPages}
           </span>
           {page < totalPages && (
             <Link href={`/alle?page=${page + 1}`}>
-              <Button variant="outline" size="sm">Weiter</Button>
+              <Button variant="outline" size="sm" className="text-[11px] text-neutral-500 border-neutral-200">Weiter</Button>
             </Link>
           )}
         </div>

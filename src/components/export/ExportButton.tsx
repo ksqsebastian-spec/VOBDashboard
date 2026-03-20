@@ -9,7 +9,7 @@ interface ExportButtonProps {
   label?: string
 }
 
-export function ExportButton({ slug, label = 'PDF exportieren' }: ExportButtonProps) {
+export function ExportButton({ slug, label = 'PDF' }: ExportButtonProps) {
   const [loading, setLoading] = useState(false)
 
   async function handleExport() {
@@ -17,7 +17,6 @@ export function ExportButton({ slug, label = 'PDF exportieren' }: ExportButtonPr
     try {
       const res = await fetch(`/api/export/${slug}`)
       const { company, tenders } = await res.json()
-
       const { generateCompanyPdf } = await import('@/lib/pdf-generator')
       const doc = await generateCompanyPdf(company.name, tenders)
       const today = new Date().toISOString().slice(0, 10)
@@ -33,12 +32,12 @@ export function ExportButton({ slug, label = 'PDF exportieren' }: ExportButtonPr
     <Button
       variant="outline"
       size="sm"
-      className="text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300 rounded-xl transition-all"
+      className="text-[11px] text-neutral-500 border-neutral-200 hover:bg-neutral-50"
       onClick={handleExport}
       disabled={loading}
     >
-      <Download size={14} className="mr-1.5" />
-      {loading ? 'Wird erstellt...' : label}
+      <Download size={12} className="mr-1" />
+      {loading ? '...' : label}
     </Button>
   )
 }

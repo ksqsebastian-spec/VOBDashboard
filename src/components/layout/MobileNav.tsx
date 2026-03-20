@@ -20,102 +20,79 @@ export function MobileNav({ companies, matchCounts = {} }: MobileNavProps) {
   return (
     <div className="lg:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger className="fixed bottom-4 right-4 z-50 rounded-full w-12 h-12 bg-gradient-to-br from-[#0B1929] to-[#132D4A] text-white shadow-xl shadow-slate-900/20 hover:shadow-slate-900/30 flex items-center justify-center transition-all duration-200 active:scale-95">
-          <Menu size={19} />
+        <SheetTrigger className="fixed bottom-4 right-4 z-50 rounded-full w-11 h-11 bg-neutral-900 text-white shadow-lg flex items-center justify-center">
+          <Menu size={18} />
         </SheetTrigger>
-        <SheetContent side="left" className="w-72 p-0 bg-gradient-to-b from-[#0B1929] to-[#0D1F33] text-white border-none">
-          <div className="flex items-center h-16 px-5 border-b border-white/[0.06]">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <span className="text-white font-black text-xs">GW</span>
+        <SheetContent side="left" className="w-[240px] p-0 bg-white">
+          <div className="flex items-center h-14 px-5">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-md bg-neutral-900 flex items-center justify-center">
+                <span className="text-white font-semibold text-[10px]">GW</span>
               </div>
-              <span className="font-bold text-white text-sm tracking-tight">VOB Monitor</span>
+              <span className="font-semibold text-neutral-900 text-[14px]">VOB Monitor</span>
             </div>
           </div>
-          <nav className="py-5 px-3">
-            <div className="space-y-0.5">
-              {[
-                { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-                { href: '/alle', label: 'Alle Ausschreibungen', icon: FileText },
-              ].map(item => {
-                const Icon = item.icon
-                const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 text-[13px] rounded-lg transition-all relative',
-                      isActive
-                        ? 'bg-white/[0.12] text-white font-medium'
-                        : 'text-white/50 hover:bg-white/[0.06]'
-                    )}
-                  >
-                    {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-blue-400 rounded-r-full" />}
-                    <Icon size={17} strokeWidth={isActive ? 2 : 1.5} className={isActive ? 'text-blue-400' : ''} />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </div>
+          <nav className="px-3 pt-2 pb-4">
+            {[
+              { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+              { href: '/alle', label: 'Alle Ausschreibungen', icon: FileText },
+            ].map(item => {
+              const Icon = item.icon
+              const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    'flex items-center gap-2.5 px-2.5 py-[7px] text-[13px] rounded-lg transition-colors',
+                    isActive ? 'bg-neutral-100 text-neutral-900 font-medium' : 'text-neutral-500'
+                  )}
+                >
+                  <Icon size={15} strokeWidth={isActive ? 2 : 1.5} />
+                  {item.label}
+                </Link>
+              )
+            })}
 
-            <div className="my-5 border-t border-white/[0.06]" />
-            <p className="px-3 text-[10px] font-semibold text-white/30 uppercase tracking-[0.15em] mb-3">
-              Unternehmen
-            </p>
-            <div className="space-y-0.5">
-              {companies.map(company => {
-                const href = `/unternehmen/${company.slug}`
-                const count = matchCounts[company.slug] || 0
-                const initials = company.name.split(/[\s.]+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()
-                return (
-                  <Link
-                    key={company.slug}
-                    href={href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      'flex items-center justify-between px-2 py-1.5 text-[13px] rounded-lg transition-all relative',
-                      pathname === href
-                        ? 'bg-white/[0.12] text-white font-medium'
-                        : 'text-white/50 hover:bg-white/[0.06]'
-                    )}
-                  >
-                    {pathname === href && (
-                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full" style={{ backgroundColor: company.color }} />
-                    )}
-                    <span className="flex items-center gap-2.5 truncate">
-                      <span
-                        className="w-7 h-7 rounded-[8px] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
-                        style={{ backgroundColor: company.color }}
-                      >
-                        {initials}
-                      </span>
-                      <span className="truncate">{company.name}</span>
-                    </span>
-                    {count > 0 && (
-                      <span className="text-[10px] font-semibold bg-white/10 text-white/70 px-2 py-0.5 rounded-full tabular-nums">{count}</span>
-                    )}
-                  </Link>
-                )
-              })}
+            <div className="mt-6 mb-2 px-2.5">
+              <p className="text-[10px] font-medium text-neutral-400 uppercase tracking-wider">Unternehmen</p>
             </div>
+            {companies.map(company => {
+              const href = `/unternehmen/${company.slug}`
+              const count = matchCounts[company.slug] || 0
+              return (
+                <Link
+                  key={company.slug}
+                  href={href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    'flex items-center justify-between px-2.5 py-[7px] text-[13px] rounded-lg transition-colors',
+                    pathname === href ? 'bg-neutral-100 text-neutral-900 font-medium' : 'text-neutral-500'
+                  )}
+                >
+                  <span className="flex items-center gap-2.5 truncate">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: company.color }} />
+                    <span className="truncate">{company.name}</span>
+                  </span>
+                  {count > 0 && <span className="text-[11px] text-neutral-400 tabular-nums">{count}</span>}
+                </Link>
+              )
+            })}
 
-            <div className="my-5 border-t border-white/[0.06]" />
-            <Link
-              href="/verlauf"
-              onClick={() => setOpen(false)}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 text-[13px] rounded-lg transition-all relative',
-                pathname === '/verlauf'
-                  ? 'bg-white/[0.12] text-white font-medium'
-                  : 'text-white/50 hover:bg-white/[0.06]'
-              )}
-            >
-              {pathname === '/verlauf' && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-blue-400 rounded-r-full" />}
-              <Clock size={17} strokeWidth={pathname === '/verlauf' ? 2 : 1.5} className={pathname === '/verlauf' ? 'text-blue-400' : ''} />
-              Verlauf
-            </Link>
+            <div className="mt-4 pt-4 border-t border-neutral-100">
+              <Link
+                href="/verlauf"
+                onClick={() => setOpen(false)}
+                className={cn(
+                  'flex items-center gap-2.5 px-2.5 py-[7px] text-[13px] rounded-lg transition-colors',
+                  pathname === '/verlauf' ? 'bg-neutral-100 text-neutral-900 font-medium' : 'text-neutral-500'
+                )}
+              >
+                <Clock size={15} strokeWidth={pathname === '/verlauf' ? 2 : 1.5} />
+                Verlauf
+              </Link>
+            </div>
           </nav>
         </SheetContent>
       </Sheet>
