@@ -43,13 +43,13 @@ CREATE TABLE companies (
 -- Seed with Gruppenwerk companies
 INSERT INTO companies (name, slug, trades, keywords, color) VALUES
   ('Seehafer Elemente', 'seehafer-elemente', ARRAY['Tischler','Fenster','Türen','Innentüren','Holzbau'], ARRAY['tischler','fenster','türen','innentüren','holz','schreiner','möbel','pfosten-riegel','fassade'], '#1F4E79'),
-  ('Tischlerei Seehafer', 'tischlerei-seehafer', ARRAY['Tischler','Möbelbau','Innenausbau'], ARRAY['tischler','möbel','innenausbau','schreiner'], '#2C5F8A'),
+  -- Tischlerei Seehafer removed (outdated name for Seehafer Elemente)
   ('Tischlerei Brink', 'tischlerei-brink', ARRAY['Tischler','Möbelbau','Innenausbau'], ARRAY['tischler','möbel','innenausbau','schreiner'], '#3A7CA5'),
   ('Maler Hantke', 'maler-hantke', ARRAY['Maler','Fassade','Anstrich','Lackierung','Tapezierung','WDVS'], ARRAY['maler','fassade','anstrich','lackier','tapezier','beschichtung','wdvs','wärmedämm','dämmung','putz'], '#E67E22'),
   ('Werner Bau', 'werner-bau', ARRAY['Rohbau','Generalunternehmer','Hochbau','Maurerarbeiten'], ARRAY['rohbau','generalunternehmer','hochbau','maurer','beton','gu-leistung','abbruch'], '#7F8C8D'),
   ('J. Werner Gerüstbau', 'werner-geruestbau', ARRAY['Gerüst','Gerüstbau','Fassadengerüst'], ARRAY['gerüst','gerüstbau','fassadengerüst','einrüstung'], '#95A5A6'),
-  ('GroundPassion', 'groundpassion', ARRAY['Garten','Landschaftsbau','Pflaster','Außenanlagen'], ARRAY['garten','landschaft','pflaster','außenanlagen','grünfläche'], '#27AE60'),
-  ('Mehlig GmbH', 'mehlig', ARRAY['Trockenbau','Akustik','Brandschutz'], ARRAY['trockenbau','akustik','brandschutz','gipskarton','rigips'], '#8E44AD');
+  ('GroundPassion', 'groundpassion', ARRAY['Immobilienberatung','Asset Management','Investment Advisory'], ARRAY['immobilien','investment','asset management','beratung','real estate'], '#27AE60'),
+  ('Mehlig GmbH', 'mehlig', ARRAY['Tischlerarbeiten','Innenausbau','Möbelbau','Objekteinrichtung'], ARRAY['tischler','innenausbau','möbelbau','objekteinrichtung','möbel','schreiner','einrichtung'], '#8E44AD');
 
 -- ═══════════════════════════════════════════════════
 -- SCANS — Log of each scraping run (created first, referenced by tenders)
@@ -644,13 +644,12 @@ Source of truth is the `companies` table. For reference:
 | Company | Slug | Core Trades |
 |---------|------|------------|
 | Seehafer Elemente | seehafer-elemente | Tischler, Fenster, Türen, Holzbau |
-| Tischlerei Seehafer | tischlerei-seehafer | Tischler, Möbelbau, Innenausbau |
 | Tischlerei Brink | tischlerei-brink | Tischler, Möbelbau, Innenausbau |
 | Maler Hantke | maler-hantke | Maler, Fassade, Anstrich, WDVS |
 | Werner Bau | werner-bau | Rohbau, GU, Hochbau |
 | J. Werner Gerüstbau | werner-geruestbau | Gerüst, Gerüstbau |
-| GroundPassion | groundpassion | Garten, Landschaftsbau, Pflaster |
-| Mehlig GmbH | mehlig | Trockenbau, Akustik, Brandschutz |
+| GroundPassion | groundpassion | Immobilienberatung, Asset Management, Investment Advisory |
+| Mehlig GmbH | mehlig | Tischlerarbeiten, Innenausbau, Möbelbau, Objekteinrichtung |
 
 ---
 

@@ -8,11 +8,23 @@ import { StatusFilter } from '@/components/filters/StatusFilter'
 import { UrgencyBadge } from '@/components/tenders/UrgencyBadge'
 import { Button } from '@/components/ui/button'
 import { formatDeadline, computeUrgency } from '@/lib/utils'
-import { Download, Trash2 } from 'lucide-react'
+import { Download, Trash2, Eye, EyeOff } from 'lucide-react'
 import type { DashboardRow } from '@/lib/types'
+
+type SortField = 'created_at' | 'deadline_date' | 'title' | 'authority' | 'category'
+type SortDir = 'asc' | 'desc'
 
 interface CompanyTenderListProps {
   tenders: DashboardRow[]
+}
+
+function sortTenders(tenders: DashboardRow[], field: SortField, dir: SortDir): DashboardRow[] {
+  return [...tenders].sort((a, b) => {
+    const av = a[field] ?? ''
+    const bv = b[field] ?? ''
+    const cmp = typeof av === 'string' ? av.localeCompare(bv as string) : 0
+    return dir === 'asc' ? cmp : -cmp
+  })
 }
 
 export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
@@ -23,6 +35,9 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [deleting, setDeleting] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [sortField, setSortField] = useState<SortField>('deadline_date')
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
+  const [viewOnly, setViewOnly] = useState(true)
 
   const filtered = useMemo(() => {
     let result = tenders
@@ -37,8 +52,8 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
           t.category?.toLowerCase().includes(q)
       )
     }
-    return result
-  }, [tenders, status, search])
+    return sortTenders(result, sortField, sortDir)
+  }, [tenders, status, search, sortField, sortDir])
 
   const allMatches = selectedTender
     ? tenders.filter(t => t.tender_id === selectedTender.tender_id)
@@ -46,6 +61,15 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
 
   const allFilteredIds = new Set(filtered.map(t => t.tender_id))
   const allSelected = filtered.length > 0 && filtered.every(t => selected.has(t.tender_id))
+
+  function toggleSort(field: SortField) {
+    if (sortField === field) {
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDir('asc')
+    }
+  }
 
   function toggleSelect(id: string) {
     setSelected(prev => {
@@ -105,15 +129,38 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
     }
   }
 
+  const SortHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
+    <th
+      className="text-left text-[11px] text-neutral-400 font-medium px-3 py-2 cursor-pointer select-none hover:text-neutral-600 transition-colors"
+      onClick={() => toggleSort(field)}
+    >
+      <span className="inline-flex items-center gap-1">
+        {children}
+        {sortField === field && (
+          <span className="text-[9px]">{sortDir === 'asc' ? '▲' : '▼'}</span>
+        )}
+      </span>
+    </th>
+  )
+
   return (
     <>
       <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-4">
         <div className="flex gap-3 items-center flex-wrap">
           <StatusFilter value={status} onChange={setStatus} />
           <SearchBar value={search} onChange={setSearch} placeholder="Suchen..." />
+          <Button
+            variant="outline"
+            size="sm"
+            className={`text-[11px] border-neutral-200 ${viewOnly ? 'bg-neutral-100 text-neutral-900' : 'text-neutral-400'}`}
+            onClick={() => { setViewOnly(v => !v); setSelected(new Set()) }}
+          >
+            {viewOnly ? <Eye size={12} className="mr-1" /> : <EyeOff size={12} className="mr-1" />}
+            {viewOnly ? 'Ansicht' : 'Bearbeiten'}
+          </Button>
         </div>
         <div className="flex items-center gap-2">
-          {selected.size > 0 && (
+          {!viewOnly && selected.size > 0 && (
             <>
               <span className="text-[11px] text-neutral-500 tabular-nums">{selected.size} ausgewählt</span>
               <Button
@@ -150,22 +197,31 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-neutral-100">
-                <th className="w-10 px-3 py-2">
-                  <input
-                    type="checkbox"
-                    checked={allSelected}
-                    onChange={toggleAll}
-                    className="rounded border-neutral-300 accent-neutral-900 w-3.5 h-3.5"
-                  />
-                </th>
-                <th className="text-left text-[11px] text-neutral-400 font-medium px-3 py-2">Titel</th>
-                <th className="text-left text-[11px] text-neutral-400 font-medium px-3 py-2">Auftraggeber</th>
-                <th className="text-left text-[11px] text-neutral-400 font-medium px-3 py-2">Frist</th>
-                <th className="text-left text-[11px] text-neutral-400 font-medium px-3 py-2">Gewerk</th>
+                {!viewOnly && (
+                  <th className="w-10 px-3 py-2">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleAll}
+                      className="rounded border-neutral-300 accent-neutral-900 w-3.5 h-3.5"
+                    />
+                  </th>
+                )}
+                <SortHeader field="title">Titel</SortHeader>
+                <SortHeader field="authority">Auftraggeber</SortHeader>
+                <SortHeader field="deadline_date">Frist</SortHeader>
+                <SortHeader field="category">Gewerk</SortHeader>
                 <th className="text-left text-[11px] text-neutral-400 font-medium px-3 py-2">Status</th>
               </tr>
             </thead>
             <tbody>
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={viewOnly ? 5 : 6} className="text-center text-[12px] text-neutral-400 py-12">
+                    Keine Ausschreibungen gefunden.
+                  </td>
+                </tr>
+              )}
               {filtered.map((tender, i) => {
                 const urgency = tender.urgency || computeUrgency(tender.deadline_date)
                 return (
@@ -173,14 +229,16 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
                     key={`${tender.tender_id}-${i}`}
                     className="border-b border-neutral-100 hover:bg-neutral-50/50 transition-colors"
                   >
-                    <td className="px-3 py-2" onClick={e => e.stopPropagation()}>
-                      <input
-                        type="checkbox"
-                        checked={selected.has(tender.tender_id)}
-                        onChange={() => toggleSelect(tender.tender_id)}
-                        className="rounded border-neutral-300 accent-neutral-900 w-3.5 h-3.5"
-                      />
-                    </td>
+                    {!viewOnly && (
+                      <td className="px-3 py-2" onClick={e => e.stopPropagation()}>
+                        <input
+                          type="checkbox"
+                          checked={selected.has(tender.tender_id)}
+                          onChange={() => toggleSelect(tender.tender_id)}
+                          className="rounded border-neutral-300 accent-neutral-900 w-3.5 h-3.5"
+                        />
+                      </td>
+                    )}
                     <td
                       className="text-[12px] max-w-xs px-3 py-2 cursor-pointer"
                       onClick={() => setSelectedTender(tender)}
@@ -224,7 +282,7 @@ export function CompanyTenderList({ tenders }: CompanyTenderListProps) {
         allMatches={allMatches}
         open={!!selectedTender}
         onOpenChange={open => { if (!open) setSelectedTender(null) }}
-        onDelete={() => router.refresh()}
+        onDelete={viewOnly ? undefined : () => router.refresh()}
       />
     </>
   )
