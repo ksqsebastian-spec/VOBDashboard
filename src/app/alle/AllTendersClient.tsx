@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useOptimistic, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { TenderDrawer } from '@/components/tenders/TenderDrawer'
@@ -11,7 +11,7 @@ import { NewBadge } from '@/components/tenders/NewBadge'
 import { Badge } from '@/components/ui/badge'
 import { formatDeadline, computeUrgency } from '@/lib/utils'
 import { suggestCompany } from '@/lib/match-suggest'
-import { Download, Trash2, AlertTriangle, ArrowUpDown, Eye, EyeOff } from 'lucide-react'
+import { Download, Trash2, AlertTriangle, Eye, EyeOff, Check } from 'lucide-react'
 import type { Company, DashboardRow } from '@/lib/types'
 
 type SortField = 'created_at' | 'deadline_date' | 'title' | 'authority' | 'category' | 'company_name'
@@ -45,12 +45,21 @@ export function AllTendersClient({ tenders, total, page, companies }: AllTenders
   const [sortField, setSortField] = useState<SortField>('created_at')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [viewOnly, setViewOnly] = useState(false)
+  const [requestedOverrides, setRequestedOverrides] = useState<Record<string, boolean>>({})
 
   const pageSize = 50
   const totalPages = Math.ceil(total / pageSize)
 
+  const tendersWithOverrides = useMemo(() =>
+    tenders.map(t => ({
+      ...t,
+      requested: requestedOverrides[t.tender_id] ?? t.requested ?? false,
+    })),
+    [tenders, requestedOverrides]
+  )
+
   const filtered = useMemo(() => {
-    let result = tenders
+    let result = tendersWithOverrides
     if (search) {
       const q = search.toLowerCase()
       result = result.filter(t =>
@@ -61,10 +70,10 @@ export function AllTendersClient({ tenders, total, page, companies }: AllTenders
       )
     }
     return sortTenders(result, sortField, sortDir)
-  }, [tenders, search, sortField, sortDir])
+  }, [tendersWithOverrides, search, sortField, sortDir])
 
   const allMatches = selectedTender
-    ? tenders.filter(t => t.tender_id === selectedTender.tender_id)
+    ? tendersWithOverrides.filter(t => t.tender_id === selectedTender.tender_id)
     : []
 
   const allFilteredIds = new Set(filtered.map(t => t.tender_id))
@@ -102,6 +111,16 @@ export function AllTendersClient({ tenders, total, page, companies }: AllTenders
         return next
       })
     }
+  }
+
+  async function toggleRequested(tenderId: string, current: boolean) {
+    const next = !current
+    setRequestedOverrides(prev => ({ ...prev, [tenderId]: next }))
+    await fetch('/api/tenders/requested', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: tenderId, requested: next }),
+    })
   }
 
   async function handleDelete() {
@@ -271,12 +290,13 @@ export function AllTendersClient({ tenders, total, page, companies }: AllTenders
               <SortHeader field="category">Gewerk</SortHeader>
               <SortHeader field="company_name">Unternehmen</SortHeader>
               <th className="text-left text-[11px] text-neutral-400 font-medium px-3 py-2">Status</th>
+              <th className="text-center text-[11px] text-neutral-400 font-medium px-3 py-2 w-[90px]">Angefordert</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={viewOnly ? 6 : 7} className="text-center text-[12px] text-neutral-400 py-12">
+                <td colSpan={viewOnly ? 7 : 8} className="text-center text-[12px] text-neutral-400 py-12">
                   Keine Ausschreibungen gefunden.
                 </td>
               </tr>
@@ -349,6 +369,18 @@ export function AllTendersClient({ tenders, total, page, companies }: AllTenders
                   >
                     <UrgencyBadge urgency={urgency} />
                   </td>
+                  <td className="px-3 py-2 text-center" onClick={e => e.stopPropagation()}>
+                    <button
+                      onClick={() => toggleRequested(tender.tender_id, tender.requested)}
+                      className={`inline-flex items-center justify-center w-5 h-5 rounded border transition-colors ${
+                        tender.requested
+                          ? 'bg-emerald-500 border-emerald-500 text-white'
+                          : 'border-neutral-300 hover:border-neutral-400 text-transparent'
+                      }`}
+                    >
+                      <Check size={12} strokeWidth={3} />
+                    </button>
+                  </td>
                 </tr>
               )
             })}
@@ -381,6 +413,7 @@ export function AllTendersClient({ tenders, total, page, companies }: AllTenders
         open={!!selectedTender}
         onOpenChange={open => { if (!open) setSelectedTender(null) }}
         onDelete={viewOnly ? undefined : () => router.refresh()}
+        onRequestedChange={toggleRequested}
       />
     </>
   )
