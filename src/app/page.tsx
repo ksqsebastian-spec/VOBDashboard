@@ -31,25 +31,13 @@ export default async function DashboardPage() {
     }
   }
 
-  const newMatches = latestScan
-    ? recentTenders.filter(t => t.scan_date === latestScan.scan_date).length
-    : 0
-
   return (
     <>
       <Header latestScan={latestScan} />
-      <div className="p-6 lg:p-8 space-y-8 max-w-[1400px] mx-auto">
-        {/* Page header */}
-        <div className="flex items-end justify-between">
-          <div>
-            <h1 className="text-[22px] font-bold text-slate-900 tracking-tight">Übersicht</h1>
-            {latestScan && newMatches > 0 && (
-              <p className="text-[13px] text-slate-500 mt-0.5">
-                <span className="font-semibold text-emerald-600">{newMatches} neue Treffer</span>{' '}
-                <span className="text-slate-400">im letzten Scan</span>
-              </p>
-            )}
-          </div>
+      <div className="p-6 lg:p-8 max-w-[1200px]">
+        {/* Title */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-[18px] font-semibold text-neutral-900">Übersicht</h1>
           <DownloadReport url={latestScan?.report_url ?? null} />
         </div>
 
@@ -60,18 +48,10 @@ export default async function DashboardPage() {
           totalMatched={totalMatched}
         />
 
-        {/* Divider */}
-        <div className="section-divider" />
-
         {/* Companies */}
-        <div>
-          <div className="flex items-center gap-2.5 mb-4">
-            <h2 className="text-[15px] font-semibold text-slate-800 tracking-tight">Unternehmen</h2>
-            <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full font-semibold tabular-nums">
-              {companies.length}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 stagger-children">
+        <div className="mt-10">
+          <p className="text-[13px] font-medium text-neutral-900 mb-4">Unternehmen</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {companies.map(company => (
               <CompanyCard
                 key={company.slug}
@@ -83,18 +63,12 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="section-divider" />
-
-        {/* Trend + Recent feed */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-5">
+        {/* Trend + Recent */}
+        <div className="mt-10 grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-4">
           <TrendChart trends={trends} />
 
-          <div className="rounded-2xl border border-slate-200/70 bg-white p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-slate-800 tracking-tight">Neueste</h2>
-              <span className="text-[9px] text-slate-400 uppercase tracking-[0.1em] font-semibold">Ausschreibungen</span>
-            </div>
+          <div className="bg-white rounded-xl border border-neutral-200/60 p-5">
+            <p className="text-[13px] font-medium text-neutral-900 mb-4">Neueste Ausschreibungen</p>
             <RecentFeed tenders={recentTenders} latestScanDate={latestScan?.scan_date} />
           </div>
         </div>

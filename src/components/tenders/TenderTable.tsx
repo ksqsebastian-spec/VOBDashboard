@@ -8,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { UrgencyBadge } from './UrgencyBadge'
 import { NewBadge } from './NewBadge'
 import { formatDeadline, computeUrgency } from '@/lib/utils'
@@ -22,22 +21,22 @@ interface TenderTableProps {
 
 export function TenderTable({ tenders, latestScanDate, onRowClick }: TenderTableProps) {
   return (
-    <div className="border border-slate-200/80 rounded-xl overflow-hidden bg-white">
+    <div className="bg-white border border-neutral-200/60 rounded-xl overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="bg-slate-50/80 border-b border-slate-200/80">
-            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Titel</TableHead>
-            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Auftraggeber</TableHead>
-            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Frist</TableHead>
-            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Gewerk</TableHead>
-            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Unternehmen</TableHead>
-            <TableHead className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Status</TableHead>
+          <TableRow className="border-neutral-100 hover:bg-transparent">
+            <TableHead className="text-[11px] text-neutral-400 font-medium">Titel</TableHead>
+            <TableHead className="text-[11px] text-neutral-400 font-medium">Auftraggeber</TableHead>
+            <TableHead className="text-[11px] text-neutral-400 font-medium">Frist</TableHead>
+            <TableHead className="text-[11px] text-neutral-400 font-medium">Gewerk</TableHead>
+            <TableHead className="text-[11px] text-neutral-400 font-medium">Unternehmen</TableHead>
+            <TableHead className="text-[11px] text-neutral-400 font-medium">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {tenders.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-sm text-slate-400 py-12">
+              <TableCell colSpan={6} className="text-center text-[12px] text-neutral-400 py-12">
                 Keine Ausschreibungen gefunden.
               </TableCell>
             </TableRow>
@@ -45,31 +44,28 @@ export function TenderTable({ tenders, latestScanDate, onRowClick }: TenderTable
           {tenders.map((tender, i) => {
             const urgency = tender.urgency || computeUrgency(tender.deadline_date)
             const isNew = latestScanDate && tender.scan_date === latestScanDate
-            const hasMatch = !!tender.company_slug
 
             return (
               <TableRow
                 key={`${tender.tender_id}-${i}`}
-                className={`cursor-pointer hover:bg-slate-50/80 transition-colors ${!hasMatch ? 'opacity-50' : ''}`}
+                className="cursor-pointer border-neutral-100 hover:bg-neutral-50/50 transition-colors"
                 onClick={() => onRowClick?.(tender)}
               >
-                <TableCell className="text-sm max-w-xs">
+                <TableCell className="text-[12px] max-w-xs">
                   <div className="flex items-center gap-2">
-                    {hasMatch && tender.company_color && (
-                      <span className="w-1 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: tender.company_color }} />
-                    )}
-                    <span className="line-clamp-1 font-medium text-slate-800">{tender.title}</span>
+                    <span className="line-clamp-1 text-neutral-800">{tender.title}</span>
                     {isNew && <NewBadge />}
                   </div>
                 </TableCell>
-                <TableCell className="text-xs text-slate-500">{tender.authority ?? '—'}</TableCell>
-                <TableCell className="text-xs text-slate-600">{formatDeadline(tender.deadline_date)}</TableCell>
-                <TableCell className="text-xs text-slate-500">{tender.category ?? '—'}</TableCell>
-                <TableCell className="text-xs">
+                <TableCell className="text-[11px] text-neutral-400">{tender.authority ?? '—'}</TableCell>
+                <TableCell className="text-[11px] text-neutral-500">{formatDeadline(tender.deadline_date)}</TableCell>
+                <TableCell className="text-[11px] text-neutral-400">{tender.category ?? '—'}</TableCell>
+                <TableCell className="text-[11px]">
                   {tender.company_name ? (
-                    <Badge variant="outline" className="text-[10px] border-slate-200" style={{ borderColor: tender.company_color ?? undefined }}>
+                    <span className="flex items-center gap-1.5 text-neutral-500">
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: tender.company_color ?? '#a3a3a3' }} />
                       {tender.company_name}
-                    </Badge>
+                    </span>
                   ) : '—'}
                 </TableCell>
                 <TableCell>

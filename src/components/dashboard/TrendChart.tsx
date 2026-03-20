@@ -9,9 +9,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts'
-import { TrendingUp } from 'lucide-react'
 import type { CompanyTrend } from '@/lib/types'
 
 interface TrendChartProps {
@@ -45,28 +43,18 @@ export function TrendChart({ trends }: TrendChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/70 bg-white p-6">
-        <div className="flex items-center gap-2.5 mb-4">
-          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
-            <TrendingUp size={16} className="text-slate-400" />
-          </div>
-          <h2 className="text-sm font-semibold text-slate-800 tracking-tight">VOB-Trends</h2>
-        </div>
-        <p className="text-xs text-slate-400">Noch keine Trenddaten vorhanden.</p>
+      <div className="bg-white rounded-xl border border-neutral-200/60 p-6">
+        <p className="text-[13px] font-medium text-neutral-900 mb-2">Trend</p>
+        <p className="text-[12px] text-neutral-400">Noch keine Trenddaten.</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white p-6">
+    <div className="bg-white rounded-xl border border-neutral-200/60 p-6">
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
-            <TrendingUp size={16} className="text-slate-400" />
-          </div>
-          <h2 className="text-sm font-semibold text-slate-800 tracking-tight">VOB-Trends</h2>
-        </div>
-        <div className="flex gap-0.5 bg-slate-100/80 rounded-xl p-0.5">
+        <p className="text-[13px] font-medium text-neutral-900">Trend</p>
+        <div className="flex gap-px bg-neutral-100 rounded-lg p-px">
           {([
             ['week', 'Woche'],
             ['month', 'Monat'],
@@ -75,10 +63,10 @@ export function TrendChart({ trends }: TrendChartProps) {
             <button
               key={key}
               onClick={() => setTimeFrame(key)}
-              className={`px-3 py-1.5 text-[11px] rounded-lg transition-all duration-200 ${
+              className={`px-2.5 py-1 text-[11px] rounded-md transition-colors ${
                 timeFrame === key
-                  ? 'bg-white text-slate-800 shadow-sm font-semibold'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-white text-neutral-900 shadow-sm font-medium'
+                  : 'text-neutral-400 hover:text-neutral-600'
               }`}
             >
               {label}
@@ -87,47 +75,37 @@ export function TrendChart({ trends }: TrendChartProps) {
         </div>
       </div>
 
-      <div className="h-64">
+      <div className="h-56">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
             <defs>
               {companies.map(([slug, { color }]) => (
-                <linearGradient key={slug} id={`gradient-${slug}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={color} stopOpacity={0.15} />
+                <linearGradient key={slug} id={`g-${slug}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity={0.08} />
                   <stop offset="100%" stopColor={color} stopOpacity={0} />
                 </linearGradient>
               ))}
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+            <CartesianGrid stroke="#f5f5f5" vertical={false} />
             <XAxis
               dataKey="week"
-              tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 500 }}
+              tick={{ fontSize: 10, fill: '#a3a3a3' }}
               stroke="transparent"
               tickLine={false}
-              axisLine={false}
             />
             <YAxis
-              tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 500 }}
+              tick={{ fontSize: 10, fill: '#a3a3a3' }}
               stroke="transparent"
               tickLine={false}
-              axisLine={false}
-              width={30}
+              width={28}
             />
             <Tooltip
               contentStyle={{
-                borderRadius: '14px',
-                border: '1px solid rgba(226,232,240,0.6)',
+                borderRadius: '8px',
+                border: '1px solid #e5e5e5',
                 fontSize: '11px',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-                padding: '10px 14px',
-                backdropFilter: 'blur(12px)',
-                backgroundColor: 'rgba(255,255,255,0.95)',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
               }}
-            />
-            <Legend
-              wrapperStyle={{ fontSize: '10px', paddingTop: '12px' }}
-              iconType="circle"
-              iconSize={6}
             />
             {companies.map(([slug, { name, color }]) => (
               <Area
@@ -136,14 +114,24 @@ export function TrendChart({ trends }: TrendChartProps) {
                 dataKey={slug}
                 name={name}
                 stroke={color}
-                strokeWidth={2}
-                fill={`url(#gradient-${slug})`}
-                dot={{ r: 2.5, fill: 'white', strokeWidth: 1.5, stroke: color }}
-                activeDot={{ r: 4.5, fill: color, strokeWidth: 0, stroke: 'transparent' }}
+                strokeWidth={1.5}
+                fill={`url(#g-${slug})`}
+                dot={false}
+                activeDot={{ r: 3, fill: color, strokeWidth: 0 }}
               />
             ))}
           </AreaChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-x-4 gap-y-1 mt-4">
+        {companies.map(([slug, { name, color }]) => (
+          <span key={slug} className="flex items-center gap-1.5 text-[11px] text-neutral-400">
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
+            {name}
+          </span>
+        ))}
       </div>
     </div>
   )
