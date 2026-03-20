@@ -20,50 +20,48 @@ export function MobileNav({ companies, matchCounts = {} }: MobileNavProps) {
   return (
     <div className="lg:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger className="fixed bottom-4 right-4 z-50 rounded-full w-12 h-12 bg-[#0B1929] text-white shadow-xl hover:bg-[#132D4A] flex items-center justify-center transition-colors">
-          <Menu size={20} />
+        <SheetTrigger className="fixed bottom-4 right-4 z-50 rounded-full w-12 h-12 bg-gradient-to-br from-[#0B1929] to-[#132D4A] text-white shadow-xl shadow-slate-900/20 hover:shadow-slate-900/30 flex items-center justify-center transition-all duration-200 active:scale-95">
+          <Menu size={19} />
         </SheetTrigger>
-        <SheetContent side="left" className="w-72 p-0 bg-[#0B1929] text-white border-none">
-          <div className="flex items-center h-16 px-5 border-b border-white/10">
+        <SheetContent side="left" className="w-72 p-0 bg-gradient-to-b from-[#0B1929] to-[#0D1F33] text-white border-none">
+          <div className="flex items-center h-16 px-5 border-b border-white/[0.06]">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25">
                 <span className="text-white font-black text-xs">GW</span>
               </div>
-              <span className="font-bold text-white text-sm">VOB Monitor</span>
+              <span className="font-bold text-white text-sm tracking-tight">VOB Monitor</span>
             </div>
           </div>
           <nav className="py-5 px-3">
-            <div className="space-y-1">
-              <Link
-                href="/"
-                onClick={() => setOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all',
-                  pathname === '/'
-                    ? 'bg-white/15 text-white font-medium'
-                    : 'text-white/60 hover:bg-white/8'
-                )}
-              >
-                <LayoutDashboard size={18} className={pathname === '/' ? 'text-blue-400' : ''} />
-                Dashboard
-              </Link>
-              <Link
-                href="/alle"
-                onClick={() => setOpen(false)}
-                className={cn(
-                  'flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all',
-                  pathname === '/alle'
-                    ? 'bg-white/15 text-white font-medium'
-                    : 'text-white/60 hover:bg-white/8'
-                )}
-              >
-                <FileText size={18} className={pathname === '/alle' ? 'text-blue-400' : ''} />
-                Alle Ausschreibungen
-              </Link>
+            <div className="space-y-0.5">
+              {[
+                { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+                { href: '/alle', label: 'Alle Ausschreibungen', icon: FileText },
+              ].map(item => {
+                const Icon = item.icon
+                const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      'flex items-center gap-3 px-3 py-2.5 text-[13px] rounded-lg transition-all relative',
+                      isActive
+                        ? 'bg-white/[0.12] text-white font-medium'
+                        : 'text-white/50 hover:bg-white/[0.06]'
+                    )}
+                  >
+                    {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-blue-400 rounded-r-full" />}
+                    <Icon size={17} strokeWidth={isActive ? 2 : 1.5} className={isActive ? 'text-blue-400' : ''} />
+                    {item.label}
+                  </Link>
+                )
+              })}
             </div>
 
-            <div className="my-5 border-t border-white/10" />
-            <p className="px-3 text-[10px] font-semibold text-white/40 uppercase tracking-[0.15em] mb-3">
+            <div className="my-5 border-t border-white/[0.06]" />
+            <p className="px-3 text-[10px] font-semibold text-white/30 uppercase tracking-[0.15em] mb-3">
               Unternehmen
             </p>
             <div className="space-y-0.5">
@@ -77,41 +75,45 @@ export function MobileNav({ companies, matchCounts = {} }: MobileNavProps) {
                     href={href}
                     onClick={() => setOpen(false)}
                     className={cn(
-                      'flex items-center justify-between px-2 py-2 text-sm rounded-lg transition-all',
+                      'flex items-center justify-between px-2 py-1.5 text-[13px] rounded-lg transition-all relative',
                       pathname === href
-                        ? 'bg-white/15 text-white font-medium'
-                        : 'text-white/60 hover:bg-white/8'
+                        ? 'bg-white/[0.12] text-white font-medium'
+                        : 'text-white/50 hover:bg-white/[0.06]'
                     )}
                   >
+                    {pathname === href && (
+                      <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-r-full" style={{ backgroundColor: company.color }} />
+                    )}
                     <span className="flex items-center gap-2.5 truncate">
                       <span
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
+                        className="w-7 h-7 rounded-[8px] flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0"
                         style={{ backgroundColor: company.color }}
                       >
                         {initials}
                       </span>
-                      <span className="truncate text-[13px]">{company.name}</span>
+                      <span className="truncate">{company.name}</span>
                     </span>
                     {count > 0 && (
-                      <span className="text-[10px] font-semibold bg-white/15 text-white/80 px-2 py-0.5 rounded-full">{count}</span>
+                      <span className="text-[10px] font-semibold bg-white/10 text-white/70 px-2 py-0.5 rounded-full tabular-nums">{count}</span>
                     )}
                   </Link>
                 )
               })}
             </div>
 
-            <div className="my-5 border-t border-white/10" />
+            <div className="my-5 border-t border-white/[0.06]" />
             <Link
               href="/verlauf"
               onClick={() => setOpen(false)}
               className={cn(
-                'flex items-center gap-3 px-3 py-2.5 text-sm rounded-lg transition-all',
+                'flex items-center gap-3 px-3 py-2.5 text-[13px] rounded-lg transition-all relative',
                 pathname === '/verlauf'
-                  ? 'bg-white/15 text-white font-medium'
-                  : 'text-white/60 hover:bg-white/8'
+                  ? 'bg-white/[0.12] text-white font-medium'
+                  : 'text-white/50 hover:bg-white/[0.06]'
               )}
             >
-              <Clock size={18} className={pathname === '/verlauf' ? 'text-blue-400' : ''} />
+              {pathname === '/verlauf' && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-blue-400 rounded-r-full" />}
+              <Clock size={17} strokeWidth={pathname === '/verlauf' ? 2 : 1.5} className={pathname === '/verlauf' ? 'text-blue-400' : ''} />
               Verlauf
             </Link>
           </nav>

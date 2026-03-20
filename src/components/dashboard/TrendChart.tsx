@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import {
-  LineChart,
-  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -23,7 +23,6 @@ type TimeFrame = 'week' | 'month' | '4weeks'
 export function TrendChart({ trends }: TrendChartProps) {
   const [timeFrame, setTimeFrame] = useState<TimeFrame>('week')
 
-  // Get unique companies
   const companyMap = new Map<string, { name: string; color: string }>()
   for (const t of trends) {
     if (!companyMap.has(t.company_slug)) {
@@ -31,7 +30,6 @@ export function TrendChart({ trends }: TrendChartProps) {
     }
   }
 
-  // Group by week
   const weekMap = new Map<string, Record<string, number>>()
   for (const t of trends) {
     const key = `KW${t.calendar_week}`
@@ -47,24 +45,28 @@ export function TrendChart({ trends }: TrendChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <div className="rounded-2xl border border-slate-200/80 bg-white p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <TrendingUp size={18} className="text-slate-400" />
-          <h2 className="text-base font-semibold text-slate-800">VOB-Trends</h2>
+      <div className="rounded-2xl border border-slate-200/70 bg-white p-6">
+        <div className="flex items-center gap-2.5 mb-4">
+          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
+            <TrendingUp size={16} className="text-slate-400" />
+          </div>
+          <h2 className="text-sm font-semibold text-slate-800 tracking-tight">VOB-Trends</h2>
         </div>
-        <p className="text-sm text-slate-400">Noch keine Trenddaten vorhanden.</p>
+        <p className="text-xs text-slate-400">Noch keine Trenddaten vorhanden.</p>
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white p-6">
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <TrendingUp size={18} className="text-slate-400" />
-          <h2 className="text-base font-semibold text-slate-800">VOB-Trends</h2>
+    <div className="rounded-2xl border border-slate-200/70 bg-white p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-slate-50 flex items-center justify-center">
+            <TrendingUp size={16} className="text-slate-400" />
+          </div>
+          <h2 className="text-sm font-semibold text-slate-800 tracking-tight">VOB-Trends</h2>
         </div>
-        <div className="flex gap-0.5 bg-slate-100 rounded-lg p-0.5">
+        <div className="flex gap-0.5 bg-slate-100/80 rounded-xl p-0.5">
           {([
             ['week', 'Woche'],
             ['month', 'Monat'],
@@ -73,7 +75,7 @@ export function TrendChart({ trends }: TrendChartProps) {
             <button
               key={key}
               onClick={() => setTimeFrame(key)}
-              className={`px-3 py-1.5 text-xs rounded-md transition-all duration-150 ${
+              className={`px-3 py-1.5 text-[11px] rounded-lg transition-all duration-200 ${
                 timeFrame === key
                   ? 'bg-white text-slate-800 shadow-sm font-semibold'
                   : 'text-slate-500 hover:text-slate-700'
@@ -87,48 +89,60 @@ export function TrendChart({ trends }: TrendChartProps) {
 
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+          <AreaChart data={chartData}>
+            <defs>
+              {companies.map(([slug, { color }]) => (
+                <linearGradient key={slug} id={`gradient-${slug}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={color} stopOpacity={0.15} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              ))}
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
             <XAxis
               dataKey="week"
-              tick={{ fontSize: 11, fill: '#94A3B8' }}
-              stroke="#E2E8F0"
+              tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 500 }}
+              stroke="transparent"
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              tick={{ fontSize: 11, fill: '#94A3B8' }}
-              stroke="#E2E8F0"
+              tick={{ fontSize: 10, fill: '#94A3B8', fontWeight: 500 }}
+              stroke="transparent"
               tickLine={false}
               axisLine={false}
+              width={30}
             />
             <Tooltip
               contentStyle={{
-                borderRadius: '12px',
-                border: '1px solid #E2E8F0',
-                fontSize: '12px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                padding: '8px 12px',
+                borderRadius: '14px',
+                border: '1px solid rgba(226,232,240,0.6)',
+                fontSize: '11px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                padding: '10px 14px',
+                backdropFilter: 'blur(12px)',
+                backgroundColor: 'rgba(255,255,255,0.95)',
               }}
             />
             <Legend
-              wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
+              wrapperStyle={{ fontSize: '10px', paddingTop: '12px' }}
               iconType="circle"
-              iconSize={8}
+              iconSize={6}
             />
             {companies.map(([slug, { name, color }]) => (
-              <Line
+              <Area
                 key={slug}
                 type="monotone"
                 dataKey={slug}
                 name={name}
                 stroke={color}
-                strokeWidth={2.5}
-                dot={{ r: 3, fill: 'white', strokeWidth: 2 }}
-                activeDot={{ r: 5, fill: color, strokeWidth: 0 }}
+                strokeWidth={2}
+                fill={`url(#gradient-${slug})`}
+                dot={{ r: 2.5, fill: 'white', strokeWidth: 1.5, stroke: color }}
+                activeDot={{ r: 4.5, fill: color, strokeWidth: 0, stroke: 'transparent' }}
               />
             ))}
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       </div>
     </div>
