@@ -66,6 +66,7 @@ export interface DashboardRow {
   scan_date: string | null
   report_url: string | null
   urgency: 'urgent' | 'soon' | 'normal' | 'expired' | 'unknown'
+  requested: boolean
 }
 
 export interface CompanyWeeklyStat {

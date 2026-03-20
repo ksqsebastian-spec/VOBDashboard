@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { UrgencyBadge } from './UrgencyBadge'
 import { formatDeadline, daysUntilDeadline, getRelevanceBgClass, computeUrgency } from '@/lib/utils'
-import { ExternalLink, Download, Trash2 } from 'lucide-react'
+import { ExternalLink, Download, Trash2, Check } from 'lucide-react'
 import { suggestCompany } from '@/lib/match-suggest'
 import type { Company, DashboardRow } from '@/lib/types'
 
@@ -16,9 +16,10 @@ interface TenderDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onDelete?: (id: string) => void
+  onRequestedChange?: (id: string, current: boolean) => void
 }
 
-export function TenderDrawer({ tender, allMatches = [], companies = [], open, onOpenChange, onDelete }: TenderDrawerProps) {
+export function TenderDrawer({ tender, allMatches = [], companies = [], open, onOpenChange, onDelete, onRequestedChange }: TenderDrawerProps) {
   if (!tender) return null
 
   const urgency = tender.urgency || computeUrgency(tender.deadline_date)
@@ -40,6 +41,26 @@ export function TenderDrawer({ tender, allMatches = [], companies = [], open, on
               <Badge variant="outline" className="text-[10px] text-neutral-500 border-neutral-200">{tender.category}</Badge>
             )}
           </div>
+
+          {onRequestedChange && (
+            <button
+              onClick={() => onRequestedChange(tender.tender_id, tender.requested)}
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-[12px] transition-colors ${
+                tender.requested
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
+                  : 'bg-neutral-50 border-neutral-200 text-neutral-500 hover:border-neutral-300'
+              }`}
+            >
+              <span>{tender.requested ? 'Angefordert' : 'Nicht angefordert'}</span>
+              <span className={`inline-flex items-center justify-center w-5 h-5 rounded border transition-colors ${
+                tender.requested
+                  ? 'bg-emerald-500 border-emerald-500 text-white'
+                  : 'border-neutral-300 text-transparent'
+              }`}>
+                <Check size={12} strokeWidth={3} />
+              </span>
+            </button>
+          )}
 
           <div className="space-y-3 text-[12px]">
             {tender.authority && (
