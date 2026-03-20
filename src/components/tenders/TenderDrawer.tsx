@@ -32,7 +32,7 @@ export function TenderDrawer({ tender, allMatches = [], companies = [], open, on
           </SheetTitle>
         </SheetHeader>
 
-        <div className="mt-4 space-y-5">
+        <div className="mt-4 space-y-5 px-4">
           <div className="flex items-center gap-2">
             <UrgencyBadge urgency={urgency} />
             {tender.category && (
