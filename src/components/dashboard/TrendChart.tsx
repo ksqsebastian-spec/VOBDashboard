@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
-import { Card } from '@/components/ui/card'
+import { TrendingUp } from 'lucide-react'
 import type { CompanyTrend } from '@/lib/types'
 
 interface TrendChartProps {
@@ -47,18 +47,24 @@ export function TrendChart({ trends }: TrendChartProps) {
 
   if (chartData.length === 0) {
     return (
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold text-[#1E293B] mb-4">Trend</h2>
-        <p className="text-sm text-[#94A3B8]">Noch keine Trenddaten vorhanden.</p>
-      </Card>
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp size={18} className="text-slate-400" />
+          <h2 className="text-base font-semibold text-slate-800">VOB-Trends</h2>
+        </div>
+        <p className="text-sm text-slate-400">Noch keine Trenddaten vorhanden.</p>
+      </div>
     )
   }
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-[#1E293B]">Trend</h2>
-        <div className="flex gap-1 bg-[#F1F5F9] rounded-lg p-0.5">
+    <div className="rounded-2xl border border-slate-200/80 bg-white p-6">
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-2">
+          <TrendingUp size={18} className="text-slate-400" />
+          <h2 className="text-base font-semibold text-slate-800">VOB-Trends</h2>
+        </div>
+        <div className="flex gap-0.5 bg-slate-100 rounded-lg p-0.5">
           {([
             ['week', 'Woche'],
             ['month', 'Monat'],
@@ -67,10 +73,10 @@ export function TrendChart({ trends }: TrendChartProps) {
             <button
               key={key}
               onClick={() => setTimeFrame(key)}
-              className={`px-3 py-1 text-xs rounded-md transition-colors ${
+              className={`px-3 py-1.5 text-xs rounded-md transition-all duration-150 ${
                 timeFrame === key
-                  ? 'bg-white text-[#1E293B] shadow-sm font-medium'
-                  : 'text-[#64748B] hover:text-[#1E293B]'
+                  ? 'bg-white text-slate-800 shadow-sm font-semibold'
+                  : 'text-slate-500 hover:text-slate-700'
               }`}
             >
               {label}
@@ -82,17 +88,34 @@ export function TrendChart({ trends }: TrendChartProps) {
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
-            <XAxis dataKey="week" tick={{ fontSize: 12 }} stroke="#94A3B8" />
-            <YAxis tick={{ fontSize: 12 }} stroke="#94A3B8" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
+            <XAxis
+              dataKey="week"
+              tick={{ fontSize: 11, fill: '#94A3B8' }}
+              stroke="#E2E8F0"
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              tick={{ fontSize: 11, fill: '#94A3B8' }}
+              stroke="#E2E8F0"
+              tickLine={false}
+              axisLine={false}
+            />
             <Tooltip
               contentStyle={{
-                borderRadius: '8px',
+                borderRadius: '12px',
                 border: '1px solid #E2E8F0',
                 fontSize: '12px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                padding: '8px 12px',
               }}
             />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Legend
+              wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }}
+              iconType="circle"
+              iconSize={8}
+            />
             {companies.map(([slug, { name, color }]) => (
               <Line
                 key={slug}
@@ -100,14 +123,14 @@ export function TrendChart({ trends }: TrendChartProps) {
                 dataKey={slug}
                 name={name}
                 stroke={color}
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5 }}
+                strokeWidth={2.5}
+                dot={{ r: 3, fill: 'white', strokeWidth: 2 }}
+                activeDot={{ r: 5, fill: color, strokeWidth: 0 }}
               />
             ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </Card>
+    </div>
   )
 }

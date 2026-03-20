@@ -1,5 +1,7 @@
 'use client'
 
+import { Search } from 'lucide-react'
+
 interface SearchBarProps {
   value: string
   onChange: (value: string) => void
@@ -9,27 +11,16 @@ interface SearchBarProps {
 export function SearchBar({ value, onChange, placeholder = 'Suchen...' }: SearchBarProps) {
   return (
     <div className="relative">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94A3B8]"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
+      <Search
+        size={15}
+        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+      />
       <input
         type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-9 pr-4 py-2 text-sm rounded-md border border-[#E2E8F0] bg-white text-[#1E293B] placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#1F4E79]/20 focus:border-[#1F4E79]"
+        className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all"
       />
     </div>
   )
