@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { UrgencyBadge } from './UrgencyBadge'
 import { formatDeadline, daysUntilDeadline, getRelevanceBgClass, computeUrgency } from '@/lib/utils'
-import { ExternalLink, Download } from 'lucide-react'
+import { ExternalLink, Download, Trash2 } from 'lucide-react'
 import { suggestCompany } from '@/lib/match-suggest'
 import type { Company, DashboardRow } from '@/lib/types'
 
@@ -15,9 +15,10 @@ interface TenderDrawerProps {
   companies?: Company[]
   open: boolean
   onOpenChange: (open: boolean) => void
+  onDelete?: (id: string) => void
 }
 
-export function TenderDrawer({ tender, allMatches = [], companies = [], open, onOpenChange }: TenderDrawerProps) {
+export function TenderDrawer({ tender, allMatches = [], companies = [], open, onOpenChange, onDelete }: TenderDrawerProps) {
   if (!tender) return null
 
   const urgency = tender.urgency || computeUrgency(tender.deadline_date)
@@ -138,6 +139,27 @@ export function TenderDrawer({ tender, allMatches = [], companies = [], open, on
             <Download size={13} className="mr-1.5" />
             PDF exportieren
           </Button>
+
+          {onDelete && (
+            <Button
+              variant="outline"
+              className="w-full text-[12px] text-red-500 border-red-200 hover:bg-red-50"
+              onClick={async () => {
+                const res = await fetch('/api/tenders/delete', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ ids: [tender.tender_id] }),
+                })
+                if (res.ok) {
+                  onDelete(tender.tender_id)
+                  onOpenChange(false)
+                }
+              }}
+            >
+              <Trash2 size={13} className="mr-1.5" />
+              Ausschreibung löschen
+            </Button>
+          )}
         </div>
       </SheetContent>
     </Sheet>
