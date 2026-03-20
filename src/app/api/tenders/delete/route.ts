@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getAdminClient } from '@/lib/supabase-admin'
 import { supabase } from '@/lib/supabase'
 
 export async function POST(request: Request) {
@@ -8,7 +9,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'No tender IDs provided' }, { status: 400 })
   }
 
-  const { error } = await supabase
+  const client = getAdminClient() ?? supabase
+
+  const { error } = await client
     .from('vob_tenders')
     .delete()
     .in('id', ids)
