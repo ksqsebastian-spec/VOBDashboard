@@ -106,3 +106,10 @@ export async function getMatchCountsByCompany() {
   }
   return counts
 }
+
+export async function getTotalTenderCount() {
+  const { count } = await supabase
+    .from('vob_tenders')
+    .select('*', { count: 'exact', head: true })
+  return count ?? 0
+}
