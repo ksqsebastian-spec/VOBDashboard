@@ -1,4 +1,4 @@
-import { getDashboardData } from '@/lib/queries'
+import { getDashboardData, getTotalTenderCount } from '@/lib/queries'
 import { StatsOverview } from '@/components/dashboard/StatsOverview'
 import { CompanyCard } from '@/components/dashboard/CompanyCard'
 import { TrendChart } from '@/components/dashboard/TrendChart'
@@ -9,7 +9,10 @@ import { RecentFeed } from './RecentFeed'
 export const revalidate = 300
 
 export default async function DashboardPage() {
-  const { companies, latestScan, recentTenders, trends } = await getDashboardData()
+  const [{ companies, latestScan, recentTenders, trends }, totalTenders] = await Promise.all([
+    getDashboardData(),
+    getTotalTenderCount(),
+  ])
 
   const totalActive = new Set(
     recentTenders.filter(t => t.status === 'active').map(t => t.tender_id)
@@ -46,6 +49,7 @@ export default async function DashboardPage() {
           latestScan={latestScan}
           totalActive={totalActive}
           totalMatched={totalMatched}
+          totalTenders={totalTenders}
         />
 
         {/* Companies */}

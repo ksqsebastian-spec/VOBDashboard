@@ -19,7 +19,7 @@ interface TrendChartProps {
 type TimeFrame = 'week' | 'month' | '6months'
 
 export function TrendChart({ trends }: TrendChartProps) {
-  const [timeFrame, setTimeFrame] = useState<TimeFrame>('week')
+  const [timeFrame, setTimeFrame] = useState<TimeFrame>('month')
 
   const companyMap = new Map<string, { name: string; color: string }>()
   for (const t of trends) {
@@ -36,7 +36,10 @@ export function TrendChart({ trends }: TrendChartProps) {
   }
 
   const allChartData = Array.from(weekMap.entries())
-    .map(([week, data]) => ({ week, ...data }))
+    .map(([week, data]) => {
+      const total = Object.values(data).reduce((sum, v) => sum + v, 0)
+      return { week, ...data, _gesamt: total }
+    })
     .reverse()
 
   const weekLimits: Record<TimeFrame, number> = {
@@ -86,6 +89,10 @@ export function TrendChart({ trends }: TrendChartProps) {
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={chartData}>
             <defs>
+              <linearGradient id="g-gesamt" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#171717" stopOpacity={0.06} />
+                <stop offset="100%" stopColor="#171717" stopOpacity={0} />
+              </linearGradient>
               {companies.map(([slug, { color }]) => (
                 <linearGradient key={slug} id={`g-${slug}`} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={color} stopOpacity={0.08} />
@@ -114,6 +121,17 @@ export function TrendChart({ trends }: TrendChartProps) {
                 boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
               }}
             />
+            <Area
+              type="monotone"
+              dataKey="_gesamt"
+              name="Gesamt"
+              stroke="#171717"
+              strokeWidth={2}
+              strokeDasharray="4 2"
+              fill="url(#g-gesamt)"
+              dot={false}
+              activeDot={{ r: 3, fill: '#171717', strokeWidth: 0 }}
+            />
             {companies.map(([slug, { name, color }]) => (
               <Area
                 key={slug}
@@ -133,6 +151,10 @@ export function TrendChart({ trends }: TrendChartProps) {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-4">
+        <span className="flex items-center gap-1.5 text-[11px] text-neutral-900 font-medium">
+          <span className="w-4 h-px border-t-2 border-dashed border-neutral-900" />
+          Gesamt
+        </span>
         {companies.map(([slug, { name, color }]) => (
           <span key={slug} className="flex items-center gap-1.5 text-[11px] text-neutral-400">
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
