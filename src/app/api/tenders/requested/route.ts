@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   const client = getAdminClient() ?? supabase
 
   const { error } = await client
-    .from('vob_tenders')
+    .schema('vob').from('vob_tenders')
     .update({ requested })
     .eq('id', id)
 
