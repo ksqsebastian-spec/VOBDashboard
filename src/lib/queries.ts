@@ -8,10 +8,10 @@ export async function getDashboardData() {
     { data: recentTenders },
     { data: trends }
   ] = await Promise.all([
-    supabase.from('companies').select('*').eq('active', true).order('name'),
-    supabase.from('vob_scans').select('*').order('scan_date', { ascending: false }).limit(1).single(),
-    supabase.from('vob_dashboard').select('*').not('company_slug', 'is', null).order('created_at', { ascending: false }).limit(20),
-    supabase.from('company_trends').select('*').order('year', { ascending: false }).order('calendar_week', { ascending: false }).limit(300)
+    supabase.schema('vob').from('companies').select('*').eq('active', true).order('name'),
+    supabase.schema('vob').from('vob_scans').select('*').order('scan_date', { ascending: false }).limit(1).single(),
+    supabase.schema('vob').from('vob_dashboard').select('*').not('company_slug', 'is', null).order('created_at', { ascending: false }).limit(20),
+    supabase.schema('vob').from('company_trends').select('*').order('year', { ascending: false }).order('calendar_week', { ascending: false }).limit(300)
   ])
   return {
     companies: (companies ?? []) as Company[],
@@ -23,7 +23,7 @@ export async function getDashboardData() {
 
 export async function getCompanyTenders(slug: string, status?: string) {
   let query = supabase
-    .from('vob_dashboard')
+    .schema('vob').from('vob_dashboard')
     .select('*')
     .eq('company_slug', slug)
     .order('deadline_date', { ascending: true })
@@ -37,7 +37,7 @@ export async function getCompanyTenders(slug: string, status?: string) {
 
 export async function getCompanyStats(slug: string) {
   const { data } = await supabase
-    .from('company_weekly_stats')
+    .schema('vob').from('company_weekly_stats')
     .select('*')
     .eq('company_slug', slug)
     .order('year', { ascending: false })
@@ -48,7 +48,7 @@ export async function getCompanyStats(slug: string) {
 
 export async function getCompany(slug: string) {
   const { data } = await supabase
-    .from('companies')
+    .schema('vob').from('companies')
     .select('*')
     .eq('slug', slug)
     .single()
@@ -60,7 +60,7 @@ export async function getAllTenders(page = 1, pageSize = 50) {
   const to = from + pageSize - 1
 
   const { data, count } = await supabase
-    .from('vob_dashboard')
+    .schema('vob').from('vob_dashboard')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(from, to)
@@ -70,7 +70,7 @@ export async function getAllTenders(page = 1, pageSize = 50) {
 
 export async function getAllScans() {
   const { data } = await supabase
-    .from('vob_scans')
+    .schema('vob').from('vob_scans')
     .select('*')
     .order('scan_date', { ascending: false })
   return (data ?? []) as VobScan[]
@@ -78,7 +78,7 @@ export async function getAllScans() {
 
 export async function getTenderById(id: string) {
   const { data } = await supabase
-    .from('vob_dashboard')
+    .schema('vob').from('vob_dashboard')
     .select('*')
     .eq('tender_id', id)
   return (data ?? []) as DashboardRow[]
@@ -86,7 +86,7 @@ export async function getTenderById(id: string) {
 
 export async function getCompanies() {
   const { data } = await supabase
-    .from('companies')
+    .schema('vob').from('companies')
     .select('*')
     .eq('active', true)
     .order('name')
@@ -95,7 +95,7 @@ export async function getCompanies() {
 
 export async function getMatchCountsByCompany() {
   const { data } = await supabase
-    .from('vob_matches')
+    .schema('vob').from('vob_matches')
     .select('company_slug')
 
   const counts: Record<string, number> = {}
@@ -109,7 +109,7 @@ export async function getMatchCountsByCompany() {
 
 export async function getTotalTenderCount() {
   const { count } = await supabase
-    .from('vob_tenders')
+    .schema('vob').from('vob_tenders')
     .select('*', { count: 'exact', head: true })
   return count ?? 0
 }
